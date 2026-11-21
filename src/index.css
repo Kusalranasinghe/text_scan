@@ -1,0 +1,102 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-[#f8fafc] text-slate-800 antialiased min-h-screen;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+}
+
+/* Custom styles for Sinhala text area to ensure optimal line height and diacritic visibility */
+.sinhala-text {
+  font-family: 'Noto Sans Sinhala', 'Iskoola Pota', system-ui, sans-serif;
+  line-height: 1.8;
+  letter-spacing: 0.01em;
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+.chemscan-splash {
+  background: radial-gradient(ellipse at 50% 42%, #145c4b 0%, #083c32 46%, #062c26 100%);
+  animation: chemscan-splash-out 1.7s ease-in-out both;
+}
+
+.chemscan-splash-content {
+  animation: chemscan-content-in 650ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.chemscan-splash-mark {
+  animation: chemscan-mark-in 700ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.chemscan-scan-line {
+  position: absolute;
+  left: 18%;
+  right: 18%;
+  top: 26%;
+  height: 2px;
+  border-radius: 9999px;
+  background: #fcd34d;
+  box-shadow: 0 0 14px rgb(252 211 77 / 75%);
+  animation: chemscan-scan 1s 250ms ease-in-out both;
+}
+
+.chemscan-progress {
+  transform-origin: left;
+  animation: chemscan-progress 1.25s 150ms ease-in-out both;
+}
+
+@keyframes chemscan-splash-out {
+  0%, 78% { opacity: 1; }
+  100% { opacity: 0; visibility: hidden; }
+}
+
+@keyframes chemscan-content-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes chemscan-mark-in {
+  from { opacity: 0; transform: scale(0.82) rotate(-8deg); }
+  to { opacity: 1; transform: scale(1) rotate(0); }
+}
+
+@keyframes chemscan-scan {
+  from { opacity: 0; transform: translateY(0); }
+  35% { opacity: 1; }
+  to { opacity: 0; transform: translateY(36px); }
+}
+
+@keyframes chemscan-progress {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chemscan-splash,
+  .chemscan-splash-content,
+  .chemscan-splash-mark,
+  .chemscan-scan-line,
+  .chemscan-progress {
+    animation: none;
+  }
+}
