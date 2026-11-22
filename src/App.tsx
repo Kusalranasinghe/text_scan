@@ -6,7 +6,7 @@ import { ApplicationFormReview } from './components/ApplicationFormReview';
 import { CameraModal } from './components/CameraModal';
 import { CropModal } from './components/CropModal';
 import { SettingsModal } from './components/SettingsModal';
-import { AlertTriangle, FlaskConical, RotateCcw } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, FlaskConical, RotateCcw } from 'lucide-react';
 import type { ApplicationFieldKey, ApplicationFormData } from './types/applicationForm';
 import type { OcrEngineConfig } from './types/ocr';
 import { getDefaultConfig, runApplicationRecognition } from './services/ocr/ocrManager';
@@ -28,8 +28,8 @@ export const App: React.FC = () => {
   const [applicationData, setApplicationData] = useState<ApplicationFormData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
-  const [submitSuccess, setSubmitSuccess] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSaveSuccessOpen, setIsSaveSuccessOpen] = useState(false);
   const recognitionRequestId = useRef(0);
 
   // Modals state
@@ -89,7 +89,6 @@ export const App: React.FC = () => {
     setApplicationData(null);
     setError(null);
     setSubmitError(null);
-    setSubmitSuccess(null);
     void recognizeSelectedImage(imageDataUrl);
   };
 
@@ -103,7 +102,6 @@ export const App: React.FC = () => {
     setApplicationData(null);
     setError(null);
     setSubmitError(null);
-    setSubmitSuccess(null);
   };
 
   const handleRecognize = async () => {
@@ -115,14 +113,12 @@ export const App: React.FC = () => {
   const handleFieldChange = (field: ApplicationFieldKey, value: string) => {
     setApplicationData((current) => current ? { ...current, [field]: value } : current);
     setSubmitError(null);
-    setSubmitSuccess(null);
   };
 
   const handleSubmitToSheets = async () => {
     if (!applicationData) return;
 
     setSubmitError(null);
-    setSubmitSuccess(null);
     setIsSubmitting(true);
     try {
       await submitApplicationToGoogleSheets(
@@ -130,7 +126,7 @@ export const App: React.FC = () => {
         config.googleAppsScriptToken,
         applicationData
       );
-      setSubmitSuccess('Application saved successfully to Google Sheets.');
+      setIsSaveSuccessOpen(true);
     } catch (err: unknown) {
       console.error('Google Sheets submission failed:', err);
       setSubmitError(err instanceof Error ? err.message : 'Failed to save the application to Google Sheets.');
@@ -220,10 +216,8 @@ export const App: React.FC = () => {
             hasGoogleSheetsConnection={Boolean(config.googleAppsScriptUrl && config.googleAppsScriptToken)}
             isSubmitting={isSubmitting}
             submitError={submitError}
-            submitSuccess={submitSuccess}
             onChange={handleFieldChange}
             onSubmit={handleSubmitToSheets}
-            onContinueAfterSave={handleRemoveImage}
             onOpenSettings={() => setIsSettingsOpen(true)}
             onRecognizeAgain={handleRecognize}
             isRecognizing={isLoading}
@@ -261,6 +255,37 @@ export const App: React.FC = () => {
           setSubmitError(null);
         }}
       />
+
+      {isSaveSuccessOpen && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-950/45 p-4 backdrop-blur-sm">
+          <section
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="save-success-title"
+            className="w-full max-w-sm rounded-3xl bg-white p-7 text-center shadow-2xl"
+          >
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100 text-emerald-800">
+              <CheckCircle2 className="h-9 w-9" />
+            </div>
+            <h2 id="save-success-title" className="mt-4 text-xl font-bold text-slate-950">
+              Saved successfully!
+            </h2>
+            <p className="mt-2 text-sm leading-relaxed text-slate-600">
+              The application has been added to Google Sheets.
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                setIsSaveSuccessOpen(false);
+                handleRemoveImage();
+              }}
+              className="mt-6 inline-flex min-h-11 w-full items-center justify-center rounded-xl bg-emerald-900 px-4 py-3 text-sm font-bold text-white transition hover:bg-emerald-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-700 focus-visible:ring-offset-2"
+            >
+              Next application
+            </button>
+          </section>
+        </div>
+      )}
 
       {showSplash && (
         <div className="chemscan-splash fixed inset-0 z-[100] flex items-center justify-center px-6 text-center">

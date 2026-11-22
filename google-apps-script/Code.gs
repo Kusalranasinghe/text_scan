@@ -63,7 +63,21 @@ function rotateToken() {
   Logger.log('APP_SCRIPT_TOKEN=' + token);
 }
 
-function doGet() {
+function doGet(e) {
+  const parameters = e && e.parameter ? e.parameter : {};
+  const requestId = parameters.requestId || '';
+  const callback = parameters.callback || '';
+  if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(requestId) &&
+      /^__chemscan_[0-9a-f]{32}$/i.test(callback)) {
+    const cachedResponse = CacheService.getScriptCache().get('cs_' + requestId);
+    const response = cachedResponse
+      ? JSON.parse(cachedResponse)
+      : { type: 'application-form-sheet-response', requestId: requestId, pending: true };
+    const jsonp = callback + '(' + JSON.stringify(response).replace(/</g, '\\u003c') + ');';
+    return ContentService.createTextOutput(jsonp)
+      .setMimeType(ContentService.MimeType.JAVASCRIPT);
+  }
+
   return HtmlService.createHtmlOutput('Application form Google Sheets endpoint is ready.');
 }
 
@@ -145,18 +159,19 @@ function respond_(result, requestId) {
   const link = result.success && result.spreadsheetUrl
     ? '<p><a href="' + escapeHtml_(result.spreadsheetUrl) + '" target="_blank" rel="noopener">Open Google Sheet</a></p>'
     : '';
-  const response = JSON.stringify({
+  const response = {
     type: 'application-form-sheet-response',
     requestId: requestId || '',
     success: Boolean(result.success),
     message: result.message || '',
     spreadsheetUrl: result.spreadsheetUrl || '',
-  }).replace(/</g, '\\u003c');
+  };
+  if (requestId) {
+    CacheService.getScriptCache().put('cs_' + requestId, JSON.stringify(response), 600);
+  }
   const html = '<!doctype html><html><head><meta name="viewport" content="width=device-width, initial-scale=1"></head>' +
     '<body style="font:16px Arial,sans-serif;max-width:640px;margin:48px auto;padding:24px;color:#1f2937">' +
-    '<h2>' + heading + '</h2><p>' + message + '</p>' + link +
-    '<script>var response = ' + response + '; window.parent.postMessage(response, "*");' +
-    'if (window.top !== window.parent) window.top.postMessage(response, "*");</script></body></html>';
+    '<h2>' + heading + '</h2><p>' + message + '</p>' + link + '</body></html>';
   return HtmlService.createHtmlOutput(html)
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }

@@ -1,5 +1,5 @@
 import React from 'react';
-import { AlertCircle, CheckCircle2, Loader2, RotateCcw, Save, Settings } from 'lucide-react';
+import { AlertCircle, Loader2, RotateCcw, Save, Settings } from 'lucide-react';
 import {
   APPLICATION_FORM_FIELDS,
   type ApplicationFieldKey,
@@ -11,10 +11,8 @@ interface ApplicationFormReviewProps {
   hasGoogleSheetsConnection: boolean;
   isSubmitting: boolean;
   submitError: string | null;
-  submitSuccess: string | null;
   onChange: (field: ApplicationFieldKey, value: string) => void;
   onSubmit: () => void;
-  onContinueAfterSave: () => void;
   onOpenSettings: () => void;
   onRecognizeAgain: () => void;
   isRecognizing: boolean;
@@ -25,10 +23,8 @@ export const ApplicationFormReview: React.FC<ApplicationFormReviewProps> = ({
   hasGoogleSheetsConnection,
   isSubmitting,
   submitError,
-  submitSuccess,
   onChange,
   onSubmit,
-  onContinueAfterSave,
   onOpenSettings,
   onRecognizeAgain,
   isRecognizing,
@@ -126,35 +122,19 @@ export const ApplicationFormReview: React.FC<ApplicationFormReviewProps> = ({
         </div>
       )}
 
-      {submitSuccess ? (
-        <div role="status" className="flex flex-col gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-900 sm:flex-row sm:items-center sm:justify-between">
-          <span className="inline-flex items-center gap-2 font-semibold">
-            <CheckCircle2 className="h-4 w-4 shrink-0" />
-            {submitSuccess}
-          </span>
-          <button
-            type="button"
-            onClick={onContinueAfterSave}
-            className="inline-flex h-10 shrink-0 items-center justify-center rounded-xl bg-emerald-900 px-4 text-xs font-bold text-white transition hover:bg-emerald-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-700 focus-visible:ring-offset-2"
-          >
-            Next application
-          </button>
-        </div>
-      ) : (
-        <button
-          type="button"
-          onClick={onSubmit}
-          disabled={
-            !hasGoogleSheetsConnection ||
-            isSubmitting ||
-            Object.values(data).every((value) => !value.trim())
-          }
-          className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-emerald-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-700 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:bg-emerald-300"
-        >
-          {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-          {isSubmitting ? 'Saving application…' : 'Save application'}
-        </button>
-      )}
+      <button
+        type="button"
+        onClick={onSubmit}
+        disabled={
+          !hasGoogleSheetsConnection ||
+          isSubmitting ||
+          Object.values(data).every((value) => !value.trim())
+        }
+        className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-emerald-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-700 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:bg-emerald-300"
+      >
+        {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+        {isSubmitting ? 'Saving application…' : 'Save application'}
+      </button>
     </div>
   </section>
 );

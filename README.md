@@ -32,7 +32,7 @@ The Apps Script creates a new spreadsheet in your Google account when `setup()` 
 3. Select `setup` in the function menu and click **Run**. Approve the Google Sheets permissions. In the execution log, copy `APP_SCRIPT_TOKEN` and the spreadsheet URL.
 4. Choose **Deploy → New deployment → Web app**. Set **Execute as** to yourself and **Who has access** to **Anyone**, then deploy and copy the Web app URL ending in `/exec`.
 5. In the app, open **Settings** and paste the Web app URL and `APP_SCRIPT_TOKEN`, then save.
-6. Scan a form, review/edit the extracted fields, and choose **Confirm & Save to Google Sheets**. After Apps Script confirms the row was saved, a success message appears in the review form; choose **Next application** to return to the first screen.
+6. Scan a form, review/edit the extracted fields, and choose **Save application**. After Apps Script confirms the row was saved, a success dialog appears; choose **Next application** to return to the first screen.
 
 The spreadsheet has an `Applications` tab. Each confirmed application is saved as one row, with a submission timestamp. Phone and ID fields are stored as text to preserve leading zeroes.
 
